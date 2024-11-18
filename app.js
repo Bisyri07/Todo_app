@@ -1,14 +1,19 @@
 const { Component, mount, xml, useState } = owl;
 
+
+// class inheritance
 class Root extends Component {
     static template = xml`
     <div>
         <div class="input-group-lg w-100 d-flex border rounded align-items-center">
             <input type="text" class="form-control-lg flex-fill border-0 me-1" 
-            placeholder="Add your new task" aria-label="Add your new task" aria-describedby="button-addon2"/>
+            placeholder="Add your new task" aria-label="Add your new task" 
+            aria-describedby="button-addon2" t-att-value="state.name" t-model="state.name"/>
+
             <input type="color" class="form-control-lg form-control-color border-0 bg-white m-0" 
-            id="color" value="#563d7c" title="Choose your color"/>
-            <button class="btn btn-primary" type="button" id="button-addon2">
+            id="color" t-att-value="state.color" title="Choose your color" t-model="state.color"/>
+            
+            <button class="btn btn-primary" type="button" id="button-addon2" t-on-click="addTask">
             <i class="bi bi-plus-lg fs-3"></i>
             </button>
         </div>
@@ -32,12 +37,44 @@ class Root extends Component {
     </ul>
     `
 
+    // life cycle method similar with __init__() in python
     setup(){
-        this.tasks = useState([
-            {id:1, name: "Task 1", color:"#0dbd3c", isComplete:false},
-            {id:2, name: "Task 2", color:"#c90404", isComplete:false},
-            {id:3, name: "Task 3", color:"#0dbd3c", isComplete:false},
-        ])
+        this.state = useState({
+            name: "",
+            color: "#0dbd3c",
+            isComplete: false,
+        })
+
+        this.tasks = useState([])
+    }
+
+    // method
+    addTask(){
+        // make a condition when user press the add button without data input
+        if (!this.state.name){
+            alert("Please provide name of your task.")
+            return
+        }
+
+        // define id with increment by 1
+        const id = this.tasks.length > 0
+            ? this.tasks[this.tasks.length - 1].id + 1 // add the last id and add it by 1
+            : 1; // initial id number start from 1
+
+        // make a new task
+        this.tasks.push({
+            id:id,
+            name:this.state.name,
+            color:this.state.color,
+            isComplete:false,
+        })
+
+        let state = this.state
+        // Reset input state
+        this.state = { ...state, name:"", color:"#0dbd3c" }
+
+        // debug 
+        console.log(this.tasks)
     }
 }
 
